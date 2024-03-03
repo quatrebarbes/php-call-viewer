@@ -1,0 +1,16 @@
+{
+    "name": "quatrebarbes/php-call-viewer",
+    "description": "Schemas the impacts of modified, created or deleted methods in the working directory of a PHP project.",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "nikic/php-parser": "dev-master",
+        "jawira/plantuml": "dev-master",
+        "gitonomy/gitlib": "dev-main"
+    }
+}
