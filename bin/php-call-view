@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-php index.php | vendor/bin/plantuml -tsvg -pipe

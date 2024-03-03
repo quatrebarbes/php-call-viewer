@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+execPath=$(dirname $0)
+php $execPath/../index.php | vendor/bin/plantuml -tsvg -pipe
