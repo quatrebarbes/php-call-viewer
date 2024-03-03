@@ -1,4 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env php
+<?php
 
-execPath=$(dirname $0)
-php $execPath/../index.php | vendor/bin/plantuml -tsvg -pipe
+$params = $argc > 1 ? implode(' ', array_slice($argv, 1)) : '';
+$script = __DIR__ . '/../index.php';
+exec("php $script $params");

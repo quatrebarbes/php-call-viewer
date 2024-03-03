@@ -1,8 +1,11 @@
 <?php
 
-foreach ([__DIR__ . '/../../autoload.php', __DIR__ . '/vendor/autoload.php'] as $file) {
-    if (file_exists($file)) {
-        require $file;
+$vendorPath;
+foreach ([__DIR__ . '/../..', __DIR__ . '/vendor'] as $folder) {
+    $autoload = $folder . '/autoload.php';
+    if (file_exists($autoload)) {
+        require $autoload;
+        $vendorPath = $folder;
         break;
     }
 }
@@ -14,7 +17,9 @@ use App\PhpVisitor\Visitor;
 use App\UmlCallTree;
 use Gitonomy\Git\Repository;
 
+const UML_PATH = './.uml';
 const TMP_PATH = './.tmp';
+$TIMESTAMP = time();
 
 ini_set('memory_limit', '1G');
 
@@ -24,11 +29,12 @@ $titleArg = $cliArgs['title'] ?? '';
 $methodsArg = $cliArgs['method'] ?? [];
 $methodsArg = is_array($methodsArg) ? $methodsArg : [$methodsArg];
 
+FileSystem::emptyFolder(TMP_PATH);
 $git = new Repository($pathArg);
 $git = $git->cloneTo(TMP_PATH, false);
 $currentProject = new PhpAnalysis(FileSystem::listFiles([$pathArg]));
 $baseProject = new PhpAnalysis(FileSystem::listFiles([TMP_PATH]));
-FileSystem::delete(TMP_PATH);
+FileSystem::emptyFolder(TMP_PATH);
 
 $classes = new Comparison(
     $currentProject->classes(),
@@ -56,4 +62,16 @@ $calls = new Comparison(
     Visitor::TO_STRING,
 );
 
-echo UmlCallTree::fromComparison($titleArg, $classes, $methods, $calls);
+$umlContent = UmlCallTree::fromComparison($titleArg, $classes, $methods, $calls);
+
+$writePath = $pathArg . UML_PATH;
+$umlWritePath = $writePath . "/$TIMESTAMP.puml";
+$svgWritePath = $writePath . "/$TIMESTAMP.svg";
+
+FileSystem::createFolder($writePath);
+FileSystem::writeFile($umlWritePath, $umlContent);
+exec("bash $vendorPath/bin/plantuml -tsvg $umlWritePath");
+$svgContent = FileSystem::readFile($svgWritePath);
+$svgContent = str_replace('</svg>',"<style>g[id^='link_']:hover > path, g[id^='link_']:hover > polygon {stroke-width: 5 !important;stroke: purple !important;}</style></svg>", $svgContent);
+FileSystem::writeFile($svgWritePath, $svgContent);
+
