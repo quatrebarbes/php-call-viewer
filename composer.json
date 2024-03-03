@@ -9,8 +9,11 @@
         }
     },
     "require": {
-        "nikic/php-parser": "dev-master",
         "jawira/plantuml": "dev-master",
-        "gitonomy/gitlib": "dev-main"
-    }
+        "gitonomy/gitlib": "dev-main",
+        "nikic/php-parser": "5.0.1"
+    },
+    "bin": [
+        "bin/php-call-viewer"
+    ]
 }
