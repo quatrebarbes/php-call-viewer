@@ -1,6 +1,4 @@
 #!/usr/bin/env php
 <?php
 
-$params = $argc > 1 ? implode(' ', array_slice($argv, 1)) : '';
-$script = __DIR__ . '/../index.php';
-exec("php $script $params");
+include __DIR__ . '/../index.php';

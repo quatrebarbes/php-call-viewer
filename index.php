@@ -23,18 +23,33 @@ $TIMESTAMP = time();
 
 ini_set('memory_limit', '1G');
 
-$cliArgs = getopt('', ["path::", "title::", "method::"]);
-$pathArg = $cliArgs['path'] ?? './';
+$cliArgs = getopt('', ["title::", "path::", "source::", "target::"]);
 $titleArg = $cliArgs['title'] ?? '';
-$methodsArg = $cliArgs['method'] ?? [];
-$methodsArg = is_array($methodsArg) ? $methodsArg : [$methodsArg];
+$pathArg = $cliArgs['path'] ?? './';
+$sourceArg = $cliArgs['source'] ?? null;
+$targetArg = $cliArgs['target'] ?? null;
+
+echo 'Read & parse the source files...' . PHP_EOL;
 
 FileSystem::emptyFolder(TMP_PATH);
 $git = new Repository($pathArg);
 $git = $git->cloneTo(TMP_PATH, false);
-$currentProject = new PhpAnalysis(FileSystem::listFiles([$pathArg]));
-$baseProject = new PhpAnalysis(FileSystem::listFiles([TMP_PATH]));
+$git = $git->getWorkingCopy();
+if (is_null($targetArg)) { // Compare with the head, if no target is set
+    $baseProject = new PhpAnalysis(FileSystem::listFiles([TMP_PATH]));
+} else {
+    $git->checkout($targetArg);
+    $baseProject = new PhpAnalysis(FileSystem::listFiles([TMP_PATH]));
+}
+if (is_null($sourceArg)) { // Use working directory, if no source is set
+    $currentProject = new PhpAnalysis(FileSystem::listFiles([$pathArg]));
+} else {
+    $git->checkout($sourceArg);
+    $currentProject = new PhpAnalysis(FileSystem::listFiles([TMP_PATH]));
+}
 FileSystem::emptyFolder(TMP_PATH);
+
+echo 'List the classes & methods...' . PHP_EOL;
 
 $classes = new Comparison(
     $currentProject->classes(),
@@ -42,13 +57,14 @@ $classes = new Comparison(
     Visitor::NAMESPACE_CLASS,
     Visitor::NAMESPACE_CLASS,
 );
-
 $methods = new Comparison(
     $currentProject->methods(),
     $baseProject->methods(),
     Visitor::NAMESPACE_CLASS_METHOD,
     Visitor::HASH,
 );
+
+echo 'Browse the method calls...' . PHP_EOL;
 
 $targetMethods = [
     ...array_column($methods->updated, Visitor::NAMESPACE_CLASS_METHOD),
@@ -62,11 +78,15 @@ $calls = new Comparison(
     Visitor::TO_STRING,
 );
 
+echo 'Write the TUML specification...' . PHP_EOL;
+
 $umlContent = UmlCallTree::fromComparison($titleArg, $classes, $methods, $calls);
 
 $writePath = $pathArg . UML_PATH;
 $umlWritePath = $writePath . "/$TIMESTAMP.puml";
 $svgWritePath = $writePath . "/$TIMESTAMP.svg";
+
+echo 'Generate the svg file...' . PHP_EOL;
 
 FileSystem::createFolder($writePath);
 FileSystem::writeFile($umlWritePath, $umlContent);
@@ -75,3 +95,5 @@ $svgContent = FileSystem::readFile($svgWritePath);
 $svgContent = str_replace('</svg>',"<style>g[id^='link_']:hover > path, g[id^='link_']:hover > polygon {stroke-width: 5 !important;stroke: purple !important;}</style></svg>", $svgContent);
 FileSystem::writeFile($svgWritePath, $svgContent);
 
+$svgWritePath = realpath($svgWritePath);
+echo "Please get your SVG:$svgWritePath " . PHP_EOL;
