@@ -22,9 +22,9 @@ ini_set('memory_limit', '1G');
 
 $cliArgs = getopt('', ["title::", "path::", "tmpPath::", "outPath::", "repo::", "base::", "head::", "filename::"]);
 $titleArg = $cliArgs['title'] ?? '';
-$pathArg = realpath($cliArgs['path'] ?? './');
-$tmpPathArg = realpath($cliArgs['tmpPath'] ?? './.tmp/');
-$outPathArg = realpath($cliArgs['outPath'] ?? './.uml/');
+$pathArg = realpath($cliArgs['path'] ?? getcwd());
+$tmpPathArg = realpath($cliArgs['tmpPath'] ?? (getcwd() . '/.tmp'));
+$outPathArg = realpath($cliArgs['outPath'] ?? (getcwd() . '/.uml'));
 $repoArg = $cliArgs['repo'] ?? null;
 $baseArg = $cliArgs['base'] ?? null;
 $headArg = $cliArgs['head'] ?? null;
