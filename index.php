@@ -95,7 +95,7 @@ echo '- Generate the svg file...' . PHP_EOL;
 
 FileSystem::createFolder($outPathArg);
 FileSystem::writeFile($umlOutPath, $umlContent);
-exec("$vendorPath/bin/plantuml -tsvg $umlOutPath");
+exec("bash $vendorPath/bin/plantuml -tsvg $umlOutPath");
 $svgContent = FileSystem::readFile($svgOutPath);
 $svgContent = str_replace('</svg>',"<style>g[id^='link_']:hover > path, g[id^='link_']:hover > polygon {stroke-width: 5 !important;stroke: purple !important;}</style></svg>", $svgContent);
 FileSystem::writeFile($svgOutPath, $svgContent);
