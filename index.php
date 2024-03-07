@@ -19,15 +19,15 @@ use Gitonomy\Git\Repository;
 
 const UML_PATH = './.uml';
 const TMP_PATH = './.tmp';
-$TIMESTAMP = time();
 
 ini_set('memory_limit', '1G');
 
-$cliArgs = getopt('', ["title::", "path::", "source::", "target::"]);
+$cliArgs = getopt('', ["title::", "path::", "source::", "target::", "filename::"]);
 $titleArg = $cliArgs['title'] ?? '';
 $pathArg = $cliArgs['path'] ?? './';
 $sourceArg = $cliArgs['source'] ?? null;
 $targetArg = $cliArgs['target'] ?? null;
+$filenameArg = $cliArgs['filename'] ?? time();
 
 echo 'Read & parse the source files...' . PHP_EOL;
 
@@ -83,8 +83,8 @@ echo 'Write the TUML specification...' . PHP_EOL;
 $umlContent = UmlCallTree::fromComparison($titleArg, $classes, $methods, $calls);
 
 $writePath = $pathArg . UML_PATH;
-$umlWritePath = $writePath . "/$TIMESTAMP.puml";
-$svgWritePath = $writePath . "/$TIMESTAMP.svg";
+$umlWritePath = $writePath . "/$filenameArg.puml";
+$svgWritePath = $writePath . "/$filenameArg.svg";
 
 echo 'Generate the svg file...' . PHP_EOL;
 
