@@ -17,7 +17,10 @@ class VisitorNewCall extends Visitor {
             $this->method = $node->name->name;
         }
 
-        if ($node instanceof Node\Expr\New_) {
+        if (
+            $node instanceof Node\Expr\New_ &&
+            !is_null($node->class->name)
+        ) {
 
             $namespace = explode('\\', $node->class->name);
             $className = array_pop($namespace);

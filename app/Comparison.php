@@ -5,7 +5,7 @@ namespace App;
 class Comparison
 {
 
-    private const CURRENT = 'current';
+    private const HEAD = 'head';
     private const BASE = 'base';
 
     public array $identical = [];
@@ -13,10 +13,10 @@ class Comparison
     public array $created   = [];
     public array $deleted   = [];
 
-    public function __construct(array $current, array $base, string $idProperty, string $compareProperty)
+    public function __construct(array $head, array $base, string $idProperty, string $compareProperty)
     {
         $toBeComparedLists = [
-            self::CURRENT => $current,
+            self::HEAD => $head,
             self::BASE => $base,
         ];
 
@@ -29,15 +29,15 @@ class Comparison
         }
 
         foreach ($mergedById as $item) {
-            if (isset($item[self::CURRENT])){
+            if (isset($item[self::HEAD])){
                 if (isset($item[self::BASE])){
-                    if ($item[self::CURRENT][$compareProperty] == $item[self::BASE][$compareProperty]){
-                        $this->identical[] = $item[self::CURRENT];
+                    if ($item[self::HEAD][$compareProperty] == $item[self::BASE][$compareProperty]){
+                        $this->identical[] = $item[self::HEAD];
                     } else {
-                        $this->updated[] = $item[self::CURRENT];
+                        $this->updated[] = $item[self::HEAD];
                     }
                 } else {
-                    $this->created[] = $item[self::CURRENT];
+                    $this->created[] = $item[self::HEAD];
                 }
             } elseif (isset($item[self::BASE])){
                 $this->deleted[] = $item[self::BASE];

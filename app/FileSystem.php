@@ -9,9 +9,8 @@ class FileSystem
 
     public static function createFolder(string $dirPath)
     {
-        $absolutePath = getcwd() . '/' . $dirPath;
-        if (!is_dir($absolutePath)) {
-            exec("mkdir -p \"$absolutePath\"");
+        if (!is_dir($dirPath)) {
+            exec("mkdir -p \"$dirPath\"");
         }
     }
 
@@ -78,13 +77,11 @@ class FileSystem
 
     public static function readFile($filePath)
     {
-        $absolutePath = getcwd() . '/' . $filePath;
-        return file_get_contents($absolutePath);
+        return file_get_contents($filePath);
     }
 
     public static function writeFile($filePath, $fileContent)
     {
-        $absolutePath = getcwd() . '/' . $filePath;
-        file_put_contents($absolutePath, $fileContent);
+        file_put_contents($filePath, $fileContent);
     }
 }
